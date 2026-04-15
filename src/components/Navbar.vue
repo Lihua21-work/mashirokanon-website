@@ -13,7 +13,7 @@
         router
       >
         <el-menu-item index="/">首页</el-menu-item>
-        <el-menu-item index="/profile">个人资料</el-menu-item>
+        <el-menu-item index="/profile">资料</el-menu-item>
         <el-menu-item index="/works">代表作品</el-menu-item>
         <el-menu-item index="/quotes">经典语录</el-menu-item>
         <el-menu-item index="/about">关于本站</el-menu-item>
@@ -38,7 +38,7 @@
         @select="isMobileMenuOpen = false"
       >
         <el-menu-item index="/">首页</el-menu-item>
-        <el-menu-item index="/profile">个人资料</el-menu-item>
+        <el-menu-item index="/profile">资料</el-menu-item>
         <el-menu-item index="/works">代表作品</el-menu-item>
         <el-menu-item index="/quotes">经典语录</el-menu-item>
         <el-menu-item index="/about">关于本站</el-menu-item>

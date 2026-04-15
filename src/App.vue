@@ -9,7 +9,7 @@
     <!-- 底部页脚 -->
     <el-footer class="footer">
       <div class="container">
-        <p>© 2026 真白花音粉丝站</p>
+        <p>© 眞白花音粉丝站</p>
       </div>
     </el-footer>
   </div>

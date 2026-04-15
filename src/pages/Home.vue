@@ -10,7 +10,7 @@
           <div class="intro-card">
             <h2>关于眞白花音</h2>
             <p>
-              眞白花音（ましろ かのん / Mashiro Kanon），是一名从2020年4月开始活动的个人势虚拟YouTuber。
+              眞白花音（ましろ かのん / Mashiro Kanon），是一名从2020年4月开始活动的个人势虚拟VUP。
               她来自日本，拥有流利的中文能力，被粉丝们亲切地称为"白菜"。
             </p>
             <p>
@@ -88,7 +88,7 @@ import Carousel from '@/components/Carousel.vue'
 // 获取路由对象
 const router = useRouter()
 
-// 跳转到个人资料页
+// 跳转到资料页
 const goToProfile = () => {
   router.push('/profile')
 }

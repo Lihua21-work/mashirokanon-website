@@ -12,9 +12,6 @@
               </el-icon>
               <p>{{ quote.content }}</p>
             </div>
-            <div class="quote-footer">
-              <span>—— 真白花音</span>
-            </div>
           </el-card>
         </el-col>
       </el-row>
@@ -25,24 +22,13 @@
 <script setup>
 import { ChatDotRound } from '@element-plus/icons-vue'
 
+// 只保留前两条语录
 const quotes = [
   {
-    content: '大家好，我是真白花音，大家可以叫我白菜！'
+    content: '给你一拳，欧拉欧拉！'
   },
   {
-    content: '中文真的好难啊，但是我会努力学习的！'
-  },
-  {
-    content: '谢谢大家的支持，我会继续加油的！'
-  },
-  {
-    content: '这个游戏好难啊，我好菜啊！'
-  },
-  {
-    content: '唱歌真开心，希望大家喜欢我的歌声！'
-  },
-  {
-    content: '大家要天天开心哦！'
+    content: '帕清姬没有女朋友～'
   }
 ]
 </script>
@@ -80,12 +66,5 @@ const quotes = [
   color: #333;
   font-size: 16px;
   font-style: italic;
-}
-
-.quote-footer {
-  text-align: right;
-  padding: 10px 20px;
-  border-top: 1px solid #eee;
-  color: #666;
 }
 </style>

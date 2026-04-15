@@ -11,8 +11,6 @@
                 <img :src="song.cover" class="work-cover" :alt="song.title" />
                 <div class="work-info">
                   <h3>{{ song.title }}</h3>
-                  <p>{{ song.artist }}</p>
-                  <el-button type="primary" size="small" link @click="openVideo(song.url)">查看视频</el-button>
                 </div>
               </el-card>
             </el-col>
@@ -26,8 +24,6 @@
                 <img :src="song.cover" class="work-cover" :alt="song.title" />
                 <div class="work-info">
                   <h3>{{ song.title }}</h3>
-                  <p>{{ song.artist }}</p>
-                  <el-button type="primary" size="small" link @click="openVideo(song.url)">查看视频</el-button>
                 </div>
               </el-card>
             </el-col>
@@ -43,57 +39,46 @@ import { ref } from 'vue'
 
 const activeTab = ref('covers')
 
-// 统一打开视频的函数
-const openVideo = (url) => {
-  window.open(url, '_blank')
-}
-
-// 翻唱歌曲（纯本地图片+真实B站链接）
+// 翻唱歌曲（顺序：Sparkle → 稻香 → Happy Halloween）
 const coverSongs = [
   {
     id: 1,
+    title: '《Sparkle》',
+    cover: new URL('@/assets/images/sparkle.jpg', import.meta.url).href,
+    url: 'https://www.bilibili.com/video/BV1Qm411o7Q9/'
+  },
+  {
+    id: 2,
     title: '《稻香》',
-    artist: '翻唱：眞白花音',
     cover: new URL('@/assets/images/daoxiang.jpg', import.meta.url).href,
     url: 'https://www.bilibili.com/video/BV1j1421o7Qj/'
   },
   {
-    id: 2,
+    id: 3,
     title: '《Happy Halloween》',
-    artist: '翻唱：眞白花音',
     cover: new URL('@/assets/images/halloween.jpg', import.meta.url).href,
     url: 'https://www.bilibili.com/video/BV1Qb421o7QH/'
-  },
-  {
-    id: 3,
-    title: '《Sparkle》',
-    artist: '翻唱：眞白花音',
-    cover: new URL('@/assets/images/sparkle.jpg', import.meta.url).href,
-    url: 'https://www.bilibili.com/video/BV1Qm411o7Q9/'
   }
 ]
 
-// 原创歌曲（占位）
+// 原创歌曲（顺序不变，保持本地图片）
 const originalSongs = [
   {
     id: 1,
-    title: '《白菜之歌》',
-    artist: '演唱：眞白花音',
-    cover: 'https://picsum.photos/id/1021/300/200',
+    title: '《恋爱模拟！ABC！》',
+    cover: new URL('@/assets/images/loveabc.jpg', import.meta.url).href,
     url: 'https://www.bilibili.com/video/BV1xx411c7mA'
   },
   {
     id: 2,
-    title: '《帕清姬之歌》',
-    artist: '演唱：眞白花音',
-    cover: 'https://picsum.photos/id/1022/300/200',
+    title: '《闪闪循环》',
+    cover: new URL('@/assets/images/kuishou.jpg', import.meta.url).href,
     url: 'https://www.bilibili.com/video/BV1xx411c7mB'
   },
   {
     id: 3,
-    title: '《菜语十级》',
-    artist: '演唱：眞白花音',
-    cover: 'https://picsum.photos/id/1023/300/200',
+    title: '《可以称为你的推吗？》',
+    cover: new URL('@/assets/images/oshitekuremasuka.jpg', import.meta.url).href,
     url: 'https://www.bilibili.com/video/BV1xx411c7mC'
   }
 ]
@@ -130,16 +115,12 @@ const originalSongs = [
 
 .work-info {
   padding: 15px;
+  text-align: center;
 }
 
 .work-info h3 {
-  margin-bottom: 10px;
+  margin: 0;
   color: #333;
   font-size: 16px;
-}
-
-.work-info p {
-  color: #666;
-  margin-bottom: 10px;
 }
 </style>
