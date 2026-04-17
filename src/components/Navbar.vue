@@ -15,9 +15,8 @@
       >
         <el-menu-item index="/">首页</el-menu-item>
         <el-menu-item index="/profile">资料</el-menu-item>
-        <el-menu-item index="/works">代表作品</el-menu-item>
+        <el-menu-item index="/works">作品</el-menu-item>
         <el-menu-item index="/quotes">经典语录</el-menu-item>
-        <el-menu-item index="/download">音视频下载</el-menu-item>
         <el-menu-item index="/games">小游戏</el-menu-item>
         <el-menu-item index="/news">动态提醒</el-menu-item>
         <el-menu-item index="/about">关于本站</el-menu-item>
@@ -29,7 +28,7 @@
       </el-icon>
     </div>
 
-    <!-- 手机端下拉菜单（在导航栏下方，拉长） -->
+    <!-- 手机端下拉菜单 -->
     <div v-if="isMobileMenuOpen" class="mobile-dropdown">
       <el-menu
         mode="vertical"
@@ -39,9 +38,8 @@
       >
         <el-menu-item index="/">首页</el-menu-item>
         <el-menu-item index="/profile">资料</el-menu-item>
-        <el-menu-item index="/works">代表作品</el-menu-item>
+        <el-menu-item index="/works">作品</el-menu-item>
         <el-menu-item index="/quotes">经典语录</el-menu-item>
-        <el-menu-item index="/download">音视频下载</el-menu-item>
         <el-menu-item index="/games">小游戏</el-menu-item>
         <el-menu-item index="/news">动态提醒</el-menu-item>
         <el-menu-item index="/about">关于本站</el-menu-item>
@@ -99,20 +97,30 @@ const isMobileMenuOpen = ref(false)
   display: none;
 }
 
-/* 手机端下拉菜单：在下方、拉长 */
+/* 手机下拉菜单：窄框 + 文字居中 */
 .mobile-dropdown {
   position: absolute;
   top: 100%;
-  left: 0;
-  right: 0;
+  right: 12px;
+  width: auto;
+  min-width: unset;
   background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
   z-index: 99;
-  max-height: 500px; /* 拉长菜单高度 */
-  overflow-y: auto;
 }
-.mobile-dropdown .el-menu {
-  border-right: none;
+.mobile-dropdown :deep(.el-menu) {
+  border: none;
+  width: auto;
+}
+.mobile-dropdown :deep(.el-menu-item) {
+  text-align: center;
+  justify-content: center;
+  padding: 0 20px;
+  height: 44px;
+  line-height: 44px;
+  width: auto;
+  white-space: nowrap;
 }
 
 @media (max-width: 900px) {

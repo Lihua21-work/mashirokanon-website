@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <!-- 轮播图 -->
+    <!-- 轮播图（已修复滑动） -->
     <Carousel />
     
     <!-- 简介部分 -->
@@ -81,24 +81,19 @@
 </template>
 
 <script setup>
-// 引入路由和轮播图组件
 import { useRouter } from 'vue-router'
 import Carousel from '@/components/Carousel.vue'
 
-// 获取路由对象
 const router = useRouter()
 
-// 跳转到资料页
 const goToProfile = () => {
   router.push('/profile')
 }
 
-// 跳转到B站主页
 const goToBilibili = () => {
   window.open('https://space.bilibili.com/401480763', '_blank')
 }
 
-// 跳转到直播间
 const goToLive = () => {
   window.open('https://live.bilibili.com/21402309/', '_blank')
 }
@@ -130,14 +125,12 @@ const goToLive = () => {
   margin-bottom: 20px;
 }
 
-/* 按钮组样式：电脑端正常布局 */
 .button-group {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-/* 手机端：强制一行、紧凑缩小、不换行 */
 @media (max-width: 768px) {
   .button-group {
     flex-wrap: nowrap;
