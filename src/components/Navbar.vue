@@ -4,33 +4,33 @@
       <div class="logo">
         <h2>眞白花音</h2>
       </div>
-      
+
       <!-- 电脑端导航 -->
       <el-menu
         class="desktop-menu"
         mode="horizontal"
         :default-active="$route.path"
         router
+        :ellipsis="false"
       >
         <el-menu-item index="/">首页</el-menu-item>
         <el-menu-item index="/profile">资料</el-menu-item>
         <el-menu-item index="/works">代表作品</el-menu-item>
         <el-menu-item index="/quotes">经典语录</el-menu-item>
+        <el-menu-item index="/download">音视频下载</el-menu-item>
+        <el-menu-item index="/games">小游戏</el-menu-item>
+        <el-menu-item index="/news">动态提醒</el-menu-item>
         <el-menu-item index="/about">关于本站</el-menu-item>
       </el-menu>
-      
+
       <!-- 手机端汉堡菜单 -->
-      <el-icon class="mobile-menu-icon" @click="isMobileMenuOpen = true">
+      <el-icon class="mobile-menu-icon" @click="isMobileMenuOpen = !isMobileMenuOpen">
         <Menu />
       </el-icon>
     </div>
-    
-    <!-- 手机端抽屉菜单 -->
-    <el-drawer
-      v-model="isMobileMenuOpen"
-      direction="right"
-      title="导航菜单"
-    >
+
+    <!-- 手机端下拉菜单（在导航栏下方，拉长） -->
+    <div v-if="isMobileMenuOpen" class="mobile-dropdown">
       <el-menu
         mode="vertical"
         :default-active="$route.path"
@@ -41,17 +41,18 @@
         <el-menu-item index="/profile">资料</el-menu-item>
         <el-menu-item index="/works">代表作品</el-menu-item>
         <el-menu-item index="/quotes">经典语录</el-menu-item>
+        <el-menu-item index="/download">音视频下载</el-menu-item>
+        <el-menu-item index="/games">小游戏</el-menu-item>
+        <el-menu-item index="/news">动态提醒</el-menu-item>
         <el-menu-item index="/about">关于本站</el-menu-item>
       </el-menu>
-    </el-drawer>
+    </div>
   </el-header>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { Menu } from '@element-plus/icons-vue'
-
-// 控制手机菜单的显示隐藏
 const isMobileMenuOpen = ref(false)
 </script>
 
@@ -60,13 +61,11 @@ const isMobileMenuOpen = ref(false)
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: #fff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  padding: 0;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,.1);
 }
-
 .container {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -74,31 +73,50 @@ const isMobileMenuOpen = ref(false)
   height: 100%;
   padding: 0 20px;
 }
-
 .logo h2 {
   margin: 0;
   color: #409eff;
   font-weight: 600;
+  white-space: nowrap;
 }
-
 .desktop-menu {
   border-bottom: none;
+  flex: 1;
+  justify-content: flex-end;
 }
-
+.desktop-menu :deep(.el-menu--horizontal) {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  flex-wrap: nowrap !important;
+}
+.desktop-menu :deep(.el-menu--horizontal .el-menu-item) {
+  float: none !important;
+  display: inline-block !important;
+}
 .mobile-menu-icon {
   font-size: 24px;
   cursor: pointer;
   display: none;
 }
 
-/* 手机端适配：小于768px显示汉堡菜单 */
-@media (max-width: 768px) {
-  .desktop-menu {
-    display: none;
-  }
-  
-  .mobile-menu-icon {
-    display: block;
-  }
+/* 手机端下拉菜单：在下方、拉长 */
+.mobile-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  z-index: 99;
+  max-height: 500px; /* 拉长菜单高度 */
+  overflow-y: auto;
+}
+.mobile-dropdown .el-menu {
+  border-right: none;
+}
+
+@media (max-width: 900px) {
+  .desktop-menu { display: none; }
+  .mobile-menu-icon { display: block; }
 }
 </style>

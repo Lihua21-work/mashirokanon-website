@@ -130,11 +130,26 @@ const goToLive = () => {
   margin-bottom: 20px;
 }
 
-/* 按钮组样式，让按钮之间有间距 */
+/* 按钮组样式：电脑端正常布局 */
 .button-group {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+/* 手机端：强制一行、紧凑缩小、不换行 */
+@media (max-width: 768px) {
+  .button-group {
+    flex-wrap: nowrap;
+    gap: 6px;
+    justify-content: center;
+  }
+  .button-group .el-button {
+    padding: 8px 10px;
+    font-size: 13px;
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .intro-image img {
