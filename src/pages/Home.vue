@@ -176,6 +176,10 @@ const goToLive = () => {
   flex-wrap: wrap;
 }
 
+.button-group .el-button {
+  margin-left: 0 !important;
+}
+
 .intro-image-wrapper {
   position: relative;
   margin-top: 20px;
@@ -292,9 +296,11 @@ const goToLive = () => {
   }
   .button-group {
     flex-direction: column;
+    width: 100%;
   }
   .button-group .el-button {
     width: 100%;
+    margin-left: 0 !important;
   }
   .image-floating-badge {
     right: 10px;

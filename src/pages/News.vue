@@ -2,215 +2,216 @@
   <div class="news-page">
     <div class="container">
       <h1 class="page-title">动态提醒</h1>
-      <p class="subtitle">第一时间获取真白花音的动态直播提醒与本站最新更新记录 🔔</p>
+      <p class="subtitle">真白花音 B 站最新动态与实时直播状态 🔔</p>
 
-      <!-- 悬浮时间轴导航 -->
-      <div class="sticky-time-nav" v-if="availableYears.length > 0">
-        <div class="nav-title">年份快速跳转</div>
-        <div class="nav-years">
-          <div 
-            v-for="year in availableYears" 
-            :key="year" 
-            class="nav-item" 
-            :class="{ active: currentYear === year }"
-            @click="scrollToYear(year)"
-          >
-            {{ year }}年
+      <!-- 直播开播状态高亮面板 -->
+      <div class="live-banner-card" :class="{ 'is-live': liveInfo.isLive }">
+        <div class="live-banner-content">
+          <div class="live-badge-wrapper">
+            <span v-if="liveInfo.isLive" class="pulse-dot live"></span>
+            <span v-else class="pulse-dot offline"></span>
+            <span class="live-status-title">
+              {{ liveInfo.isLive ? '🔴 LIVE 正在直播中' : '⚪ 目前暂未开播' }}
+            </span>
+            <el-tag v-if="liveInfo.online > 0" type="danger" size="small" round style="margin-left: 8px;">
+              🔥 人气 {{ formatOnline(liveInfo.online) }}
+            </el-tag>
           </div>
+
+          <h2 class="live-room-title">
+            {{ liveInfo.isLive ? liveInfo.title : '真白花音 Bilibili 官方直播间 (21402309)' }}
+          </h2>
+
+          <p class="live-room-desc">
+            {{ liveInfo.isLive ? '花音正处于直播陪伴中，快点击右侧按钮进入直播间互动吧！' : '关注直播间，不错过下一次惊艳的 Live 陪伴~' }}
+          </p>
+        </div>
+
+        <div class="live-banner-action">
+          <el-button 
+            :type="liveInfo.isLive ? 'danger' : 'primary'" 
+            size="large" 
+            round 
+            class="live-btn"
+            @click="openLive"
+          >
+            <el-icon style="margin-right: 6px;"><VideoCamera /></el-icon>
+            {{ liveInfo.isLive ? '进入直播间' : '前往直播间' }}
+          </el-button>
         </div>
       </div>
 
-      <el-row :gutter="28">
-        <!-- 左栏：真白花音的动态和直播提醒 -->
-        <el-col :xs="24" :md="12">
-          <div class="box-card">
-            <div class="card-header">
-              <div class="header-left">
-                <el-icon class="header-icon pink"><VideoCamera /></el-icon>
-                <span>真白花音 动态与直播提醒</span>
-              </div>
-              <el-button type="danger" size="small" round plain @click="openLive">
-                <el-icon style="margin-right: 4px;"><VideoCamera /></el-icon>
-                直播间 21402309
-              </el-button>
-            </div>
-
-            <!-- 直播状态简报 -->
-            <div class="live-status-box">
-              <div class="status-badge-group">
-                <span class="status-dot grey"></span>
-                <span class="status-text">B站个人空间动态 & 历史直播预告</span>
-              </div>
-              <p class="live-tip">提示：如无法获取即时推送，可点击下方按钮直接跳转 B 站主页查看最新动态。</p>
-              <el-button type="primary" size="small" round @click="openBiliSpace">
-                <el-icon style="margin-right: 4px;"><ArrowRight /></el-icon>
-                前往 B站 个人主页
-              </el-button>
-            </div>
-
-            <!-- 动态与直播提醒列表 (有就填上，没有就展示空状态) -->
-            <div class="timeline-container">
-              <el-timeline v-if="kanonNews.length > 0">
-                <el-timeline-item
-                  v-for="(item, index) in kanonNews"
-                  :key="index"
-                  :type="item.type"
-                  :timestamp="item.date"
-                  placement="top"
-                >
-                  <div class="timeline-card" :data-year="item.date.substring(0, 4)">
-                    <div class="timeline-tag">
-                      <el-tag :type="item.tagType" size="small" round>{{ item.tag }}</el-tag>
-                    </div>
-                    <h3 class="timeline-title">{{ item.title }}</h3>
-                    <p class="timeline-content">{{ item.content }}</p>
-                  </div>
-                </el-timeline-item>
-              </el-timeline>
-
-              <!-- 找不到动态时展示空状态 -->
-              <el-empty v-else description="暂无更多动态提醒" :image-size="80" />
-            </div>
+      <!-- 控制与操作工具栏 -->
+      <div class="control-bar">
+        <div class="control-left">
+          <div class="section-badge">
+            <el-icon class="header-icon pink"><ChatDotSquare /></el-icon>
+            <span class="section-title">最新 5 条动态提醒</span>
           </div>
-        </el-col>
+        </div>
 
-        <!-- 右栏：网站的更新 -->
-        <el-col :xs="24" :md="12">
-          <div class="box-card">
-            <div class="card-header">
-              <div class="header-left">
-                <el-icon class="header-icon green"><Refresh /></el-icon>
-                <span>网站的更新</span>
-              </div>
-              <el-tag type="success" size="small" round>v0.1.2</el-tag>
-            </div>
+        <div class="control-right">
+          <span class="last-update-time" v-if="lastUpdated">
+            更新于 {{ lastUpdated }}
+          </span>
+          <el-button 
+            type="primary" 
+            size="small" 
+            round 
+            :loading="isLoading"
+            @click="loadData(true)"
+          >
+            <el-icon style="margin-right: 4px;"><Refresh /></el-icon>
+            刷新动态
+          </el-button>
+          <el-button type="info" size="small" round plain @click="openBiliSpace">
+            <el-icon style="margin-right: 4px;"><Link /></el-icon>
+            前往 B站 主页
+          </el-button>
+        </div>
+      </div>
 
-            <!-- 网站更新日志列表 -->
-            <div class="timeline-container">
-              <el-timeline v-if="siteNews.length > 0">
-                <el-timeline-item
-                  v-for="(item, index) in siteNews"
-                  :key="index"
-                  :type="item.type"
-                  :timestamp="item.date"
-                  placement="top"
-                >
-                  <div class="timeline-card site-card" :data-year="item.date.substring(0, 4)">
-                    <div class="timeline-tag">
-                      <el-tag :type="item.tagType" size="small" round>{{ item.tag }}</el-tag>
-                    </div>
-                    <h3 class="timeline-title">{{ item.title }}</h3>
-                    <p class="timeline-content">{{ item.content }}</p>
+      <!-- 动态提醒列表卡片 -->
+      <div class="box-card">
+        <div class="timeline-container" v-loading="isLoading">
+          <el-timeline v-if="kanonNews.length > 0">
+            <el-timeline-item
+              v-for="(item, index) in displayNews"
+              :key="item.id || index"
+              :type="item.type || 'primary'"
+              :timestamp="item.date"
+              placement="top"
+            >
+              <div class="timeline-card">
+                <div class="card-top-bar">
+                  <div class="timeline-tag">
+                    <el-tag :type="item.tagType" size="small" round>{{ item.tag }}</el-tag>
+                    <el-tag v-if="item.isRealtime" type="info" size="small" effect="light" round class="realtime-badge">
+                      ⚡ 实时推送
+                    </el-tag>
                   </div>
-                </el-timeline-item>
-              </el-timeline>
+                  <a 
+                    v-if="item.url" 
+                    :href="item.url" 
+                    target="_blank" 
+                    class="bili-link-btn"
+                  >
+                    查看 B 站原动态 <el-icon><TopRight /></el-icon>
+                  </a>
+                </div>
 
-              <el-empty v-else description="暂无网站更新记录" :image-size="80" />
-            </div>
-          </div>
-        </el-col>
-      </el-row>
+                <h3 class="timeline-title" v-if="item.title && item.title !== item.content">
+                  {{ item.title }}
+                </h3>
+                <p class="timeline-content">{{ item.content }}</p>
+
+                <!-- 动态附带图片网络 -->
+                <div class="dynamic-image-grid" v-if="item.images && item.images.length > 0">
+                  <div 
+                    v-for="(img, imgIdx) in item.images" 
+                    :key="imgIdx" 
+                    class="img-item"
+                  >
+                    <el-image 
+                      :src="img" 
+                      :preview-src-list="item.images"
+                      :initial-index="imgIdx"
+                      fit="cover"
+                      loading="lazy"
+                      preview-teleported
+                    />
+                  </div>
+                </div>
+              </div>
+            </el-timeline-item>
+          </el-timeline>
+
+          <el-empty v-else description="由于 B 站接口限制，当前无法自动获取最新动态 ＞_＜" :image-size="80">
+            <el-button type="primary" round @click="openBiliSpace">
+              去 B 站个人主页查看最新动态
+            </el-button>
+          </el-empty>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { VideoCamera, ArrowRight, Refresh } from '@element-plus/icons-vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { VideoCamera, Refresh, Link, ChatDotSquare, TopRight } from '@element-plus/icons-vue'
+import { fetchLiveStatus, fetchUserDynamics } from '@/utils/bilibili'
 
-const currentYear = ref(new Date().getFullYear().toString())
+const isLoading = ref(false)
+const lastUpdated = ref('')
+let timer = null
 
-const scrollToYear = (year) => {
-  currentYear.value = year
-  const element = document.querySelector(`[data-year="${year}"]`)
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+// 直播状态数据
+const liveInfo = ref({
+  isLive: false,
+  title: '',
+  online: 0,
+  roomUrl: 'https://live.bilibili.com/21402309'
+})
+
+// 动态数据列表
+const kanonNews = ref([])
+
+// 严格限定展示最新的 5 条动态
+const displayNews = computed(() => {
+  return kanonNews.value.slice(0, 5)
+})
+
+const formatOnline = (online) => {
+  if (!online) return 0
+  if (online >= 10000) {
+    return (online / 10000).toFixed(1) + ' 万'
   }
+  return online.toString()
 }
 
-// 一栏：真白花音的动态和直播提醒 (搜到即填，找不到可留空)
-const kanonNews = ref([
-  {
-    date: '2026-05-01',
-    title: '【毕业特别 Live】真白花音毕业 Live 直播提醒',
-    content: '真白花音正式进行 Bilibili 毕业 Live 特别直播，感谢广大帕清姬长久以来的支持与陪伴。',
-    tag: '直播提醒',
-    tagType: 'danger',
-    type: 'danger'
-  },
-  {
-    date: '2025-06-21',
-    title: '全新女仆形象发布会 Live',
-    content: '画师：ana | 模型：梦野依依，全新精致女仆造型直播公开！',
-    tag: '形象发布',
-    tagType: 'warning',
-    type: 'success'
-  },
-  {
-    date: '2024-12-28',
-    title: '3D 娃娃菜形象发布会直播',
-    content: '全新 3D 娃娃菜模型登场，带来更生动活泼的直播陪伴体验。',
-    tag: '3D发布',
-    tagType: 'success',
-    type: 'primary'
-  }
-])
+// 加载实时数据
+const loadData = async (manual = false) => {
+  isLoading.value = true
+  try {
+    // 1. 获取直播开播状态
+    const liveRes = await fetchLiveStatus()
+    if (liveRes) {
+      liveInfo.value = liveRes
+    }
 
-// 另一栏：网站的更新
-const siteNews = ref([
-  {
-    date: '2026-04-17',
-    title: 'v0.1.2 移动端交互修复',
-    content: '解决移动端轮播图左右滑动体验，优化顶部导航适配与图片资源依赖路径。',
-    tag: 'v0.1.2',
-    tagType: 'success',
-    type: 'success'
-  },
-  {
-    date: '2026-04-17',
-    title: 'v0.1.1 导航与布局优化',
-    content: '优化导航栏呈现效果，新增「小游戏」「动态提醒」栏目，提升多端联动交互。',
-    tag: 'v0.1.1',
-    tagType: 'warning',
-    type: 'warning'
-  },
-  {
-    date: '2026-04-15',
-    title: 'v0.1.0 内容完善与修正',
-    content: '清理冗余内容与视频跳转，调整代表作品排序及图片展示，修正页面细节文案。',
-    tag: 'v0.1.0',
-    tagType: 'primary',
-    type: 'primary'
-  },
-  {
-    date: '2026-04-15',
-    title: '眞白花音粉丝纪念网站上线',
-    content: '提供个人资料、作品列表、游玩的工程游戏以及经典名场面语录收集。',
-    tag: '站点上线',
-    tagType: 'info',
-    type: 'info'
-  }
-])
+    // 2. 获取用户最新 B 站动态 (自动限制最多 5 条)
+    const dynamicsRes = await fetchUserDynamics()
+    if (dynamicsRes && Array.isArray(dynamicsRes) && dynamicsRes.length > 0) {
+      kanonNews.value = dynamicsRes.slice(0, 5)
+    }
 
-const availableYears = computed(() => {
-  const years = new Set()
-  kanonNews.value.forEach(item => years.add(item.date.substring(0, 4)))
-  siteNews.value.forEach(item => years.add(item.date.substring(0, 4)))
-  return Array.from(years).sort((a, b) => b - a)
-})
+    // 更新时间标记
+    const now = new Date()
+    lastUpdated.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+  } catch (err) {
+    console.error('加载数据失败:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const openBiliSpace = () => {
   window.open('https://space.bilibili.com/401480763', '_blank')
 }
 
 const openLive = () => {
-  window.open('https://live.bilibili.com/21402309/', '_blank')
+  window.open(liveInfo.value.roomUrl || 'https://live.bilibili.com/21402309/', '_blank')
 }
+
+onMounted(() => {
+  loadData()
+})
 </script>
 
 <style scoped>
 .container {
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 40px 24px;
 }
@@ -220,179 +221,263 @@ const openLive = () => {
   color: var(--text-secondary);
   font-size: 15px;
   margin-top: -24px;
-  margin-bottom: 20px;
-}
-
-.sticky-time-nav {
-  position: sticky;
-  top: 84px;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  padding: 12px 24px;
-  border-radius: var(--radius-full, 9999px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  margin: 0 auto 32px;
-  width: max-content;
-  border: 1px solid rgba(255, 123, 155, 0.2);
-}
-
-.nav-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-right: 8px;
-}
-
-.nav-years {
-  display: flex;
-  gap: 8px;
-}
-
-.nav-item {
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-regular);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(0, 0, 0, 0.04);
-}
-
-.nav-item:hover {
-  background: rgba(255, 123, 155, 0.1);
-  color: var(--primary-color);
-}
-
-.nav-item.active {
-  background: var(--primary-color);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(255, 123, 155, 0.3);
-}
-
-.box-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
   margin-bottom: 24px;
-  height: calc(100% - 24px);
-  display: flex;
-  flex-direction: column;
 }
 
-.card-header {
+/* 直播开播状态 Banner 卡片 */
+.live-banner-card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--card-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-lg, 16px);
+  padding: 24px 28px;
+  margin-bottom: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--text-main);
-  margin-bottom: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.header-left {
+.live-banner-card.is-live {
+  background: linear-gradient(135deg, #fff5f7 0%, #ffffff 100%);
+  border: 1.5px solid #ff7b9b;
+  box-shadow: 0 6px 24px rgba(255, 123, 155, 0.15);
+}
+
+.live-banner-content {
+  flex: 1;
+  padding-right: 20px;
+}
+
+.live-badge-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 8px;
 }
 
-.header-icon {
-  font-size: 18px;
-}
-
-.header-icon.pink {
-  color: var(--primary-color);
-}
-
-.header-icon.green {
-  color: var(--secondary-color);
-}
-
-.live-status-box {
-  background: rgba(255, 123, 155, 0.04);
-  border: 1px dashed rgba(255, 123, 155, 0.2);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  margin-bottom: 20px;
-}
-
-.status-badge-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
+.pulse-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
+  display: inline-block;
 }
 
-.status-dot.grey {
+.pulse-dot.live {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: pulse-red 1.6s infinite;
+}
+
+.pulse-dot.offline {
   background-color: #94a3b8;
 }
 
-.status-text {
-  font-weight: 600;
-  font-size: 13px;
+@keyframes pulse-red {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.live-status-title {
+  font-weight: 700;
+  font-size: 14px;
   color: var(--text-main);
 }
 
-.live-tip {
+.live-room-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 4px 0 6px 0;
+  line-height: 1.4;
+}
+
+.live-room-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.live-btn {
+  font-weight: 600;
+  padding: 12px 24px;
+  box-shadow: 0 4px 12px rgba(255, 123, 155, 0.25);
+}
+
+/* 顶部操作工具栏 */
+.control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 123, 155, 0.15);
+}
+
+.control-left, .control-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon.pink {
+  color: var(--primary-color, #ff7b9b);
+  font-size: 18px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.last-update-time {
   font-size: 12px;
   color: var(--text-secondary);
-  margin: 0 0 10px 0;
-  line-height: 1.5;
+  margin-right: 4px;
+}
+
+/* 动态列表卡片容器 */
+.box-card {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--card-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--radius-lg, 16px);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
 }
 
 .timeline-container {
   padding-top: 6px;
-  flex: 1;
 }
 
 .timeline-card {
   background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: var(--radius-md);
-  padding: 16px 18px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .timeline-card:hover {
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
-.site-card {
-  border-left: 3px solid var(--secondary-color);
+.card-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .timeline-tag {
-  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.realtime-badge {
+  font-weight: 600;
+}
+
+.bili-link-btn {
+  font-size: 12px;
+  color: var(--primary-color, #ff7b9b);
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  transition: opacity 0.2s ease;
+}
+
+.bili-link-btn:hover {
+  opacity: 0.8;
+  text-decoration: underline;
 }
 
 .timeline-title {
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   color: var(--text-main);
   font-size: 15px;
   font-weight: 700;
+  line-height: 1.4;
 }
 
 .timeline-content {
-  margin: 0;
+  margin: 0 0 12px 0;
   color: var(--text-regular);
   line-height: 1.6;
-  font-size: 13px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 动态图片预览网络 */
+.dynamic-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.img-item {
+  width: 100%;
+  height: 110px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.img-item .el-image {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 640px) {
+  .live-banner-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .live-banner-action {
+    width: 100%;
+  }
+  .live-btn {
+    width: 100%;
+  }
+  .control-bar {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .control-right {
+    justify-content: space-between;
+  }
 }
 </style>

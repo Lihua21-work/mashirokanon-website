@@ -28,7 +28,7 @@
         </div>
         <el-divider class="footer-divider" />
         <div class="footer-bottom">
-          <p>© 2026 眞白花音粉丝站 · Crafted with <span class="heart">♥</span> for Mashiro Kanon</p>
+          <p>© 2026 眞白花音粉丝站 · <span class="version-tag">v{{ SITE_VERSION }}</span> · Crafted with <span class="heart">♥</span> for Mashiro Kanon</p>
         </div>
       </div>
     </footer>
@@ -37,6 +37,7 @@
 
 <script setup>
 import Navbar from '@/components/Navbar.vue'
+import { SITE_VERSION } from '@/data/changelog.js'
 </script>
 
 <style scoped>
@@ -111,6 +112,17 @@ import Navbar from '@/components/Navbar.vue'
   text-align: center;
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+.version-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 12px;
+  background: rgba(255, 123, 155, 0.1);
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 12px;
+  margin: 0 4px;
 }
 
 .heart {

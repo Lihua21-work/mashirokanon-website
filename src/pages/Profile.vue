@@ -50,7 +50,12 @@
               </template>
 
               <el-descriptions :column="isMobile ? 1 : 2" border class="custom-descriptions">
-                <el-descriptions-item label="性别">女 ♀</el-descriptions-item>
+                <el-descriptions-item label="性别">
+                  <span class="gender-box">
+                    <span>女</span>
+                    <span class="gender-symbol">♀</span>
+                  </span>
+                </el-descriptions-item>
                 <el-descriptions-item label="生日">5月29日 (双子座)</el-descriptions-item>
                 <el-descriptions-item label="身高">158 cm</el-descriptions-item>
                 <el-descriptions-item label="职业">虚拟 VUP / 歌姬</el-descriptions-item>
@@ -224,6 +229,22 @@ onUnmounted(() => {
   color: var(--text-main);
   background: rgba(255, 123, 155, 0.04) !important;
   width: 120px;
+}
+
+.gender-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.gender-symbol {
+  color: #ff7b9b;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  display: inline-block;
+  transform: translateY(-0.5px);
 }
 
 .color-badge {

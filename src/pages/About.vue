@@ -49,10 +49,42 @@
             </el-descriptions-item>
           </el-descriptions>
         </div>
+
+        <el-divider />
+
+        <div class="section-block">
+          <div class="section-header">
+            <h3 class="block-title">🚀 网站更新日志</h3>
+            <el-tag type="danger" size="small" round>当前版本 v{{ SITE_VERSION }}</el-tag>
+          </div>
+          <div class="changelog-container">
+            <el-timeline>
+              <el-timeline-item
+                v-for="(item, index) in siteUpdates"
+                :key="index"
+                :type="item.type"
+                :timestamp="item.date"
+                placement="top"
+              >
+                <div class="changelog-card">
+                  <div class="changelog-header">
+                    <h4 class="changelog-title">{{ item.title }}</h4>
+                    <el-tag :type="item.tagType" size="small" round>{{ item.tag }}</el-tag>
+                  </div>
+                  <p class="changelog-content">{{ item.content }}</p>
+                </div>
+              </el-timeline-item>
+            </el-timeline>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<script setup>
+import { SITE_VERSION, siteUpdates } from '@/data/changelog.js'
+</script>
 
 <style scoped>
 .container {
@@ -73,7 +105,50 @@
   font-size: 18px;
   font-weight: 700;
   color: var(--text-main);
-  margin: 0 0 12px 0;
+  margin: 0;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.changelog-container {
+  padding-top: 8px;
+}
+
+.changelog-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-left: 3px solid var(--secondary-color);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.changelog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.changelog-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.changelog-content {
+  margin: 0;
+  color: var(--text-regular);
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .block-text {
