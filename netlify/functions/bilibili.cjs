@@ -82,6 +82,10 @@ exports.handler = async function(event, context) {
       'Referer': `https://space.bilibili.com/${UID}`
     };
 
+    if (process.env.BILI_SESSDATA) {
+      fetchHeaders['Cookie'] = `SESSDATA=${process.env.BILI_SESSDATA}`;
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
