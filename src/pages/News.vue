@@ -19,7 +19,7 @@
           </div>
 
           <h2 class="live-room-title">
-            {{ liveInfo.title ? `直播间名称：${liveInfo.title}` : '真白花音 Bilibili 官方直播间 (21402309)' }}
+            {{ liveInfo.title ? `直播间标题：${liveInfo.title}` : '真白花音 Bilibili 官方直播间 (21402309)' }}
           </h2>
 
           <p class="live-room-desc">
