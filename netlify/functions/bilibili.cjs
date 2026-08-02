@@ -76,6 +76,8 @@ exports.handler = async function(event, context) {
 
   // 2. 服务端尝试通过 B 站官方 Wbi 签名获取动态
   let dynamics = [];
+  let debugInfo = null;
+
   try {
     const fetchHeaders = {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -102,6 +104,8 @@ exports.handler = async function(event, context) {
     const dynRes = await fetch(dynUrl, { headers: fetchHeaders, signal: controller.signal });
     const dynData = await dynRes.json();
     clearTimeout(timeoutId);
+    
+    debugInfo = dynData;
 
     if (dynData.code === 0 && dynData.data && dynData.data.items) {
       dynamics = dynData.data.items.slice(0, 5).map((item, idx) => {
@@ -134,12 +138,14 @@ exports.handler = async function(event, context) {
     }
   } catch (err) {
     console.error('Wbi API fetch error:', err.message);
+    debugInfo = err.message;
   }
 
   const result = {
     success: true,
     live: liveStatus,
-    dynamics: dynamics
+    dynamics: dynamics,
+    debug: debugInfo
   };
 
   return {
