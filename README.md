@@ -1,7 +1,7 @@
 # 眞白花音粉丝站
 
 ## 版本说明
-**当前版本：v0.1.4**
+**当前版本：v0.1.5**
 为眞白花音（帕清姬）打造的轻量化、高颜值个人粉丝站点，持续迭代优化中。
 
 👉 [点击查看完整的 GitHub Releases 版本更新日志](https://github.com/Lihua21-work/mashirokanon-website/releases)

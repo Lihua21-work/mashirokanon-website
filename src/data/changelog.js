@@ -4,6 +4,14 @@ export const SITE_VERSION = pkg.version
 
 export const siteUpdates = [
   {
+    date: '2026-08-02',
+    title: 'v0.1.5 部署环境深度适配',
+    content: '修复了动态提醒在 Netlify 部署环境下的 Serverless 接口失效问题，重写并迁移了服务端功能路由，确保线上稳定提供真实 B 站动态查询。',
+    tag: 'v0.1.5',
+    tagType: 'success',
+    type: 'success'
+  },
+  {
     date: '2026-08-01',
     title: 'v0.1.4 动态提醒与 Serverless 升级',
     content: '重构「动态提醒」页面：新增直播间实时开播状态监控看板；接入 Serverless API 与 Wbi 加密签名技术实现 B 站动态全自动实时获取；彻底清理写死假数据并优化为单次+手动刷新机制；展示精简限制为最新的 5 条动态。',
