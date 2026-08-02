@@ -19,11 +19,11 @@
           </div>
 
           <h2 class="live-room-title">
-            {{ liveInfo.isLive ? liveInfo.title : '真白花音 Bilibili 官方直播间 (21402309)' }}
+            {{ liveInfo.title ? `直播间名称：${liveInfo.title}` : '真白花音 Bilibili 官方直播间 (21402309)' }}
           </h2>
 
           <p class="live-room-desc">
-            {{ liveInfo.isLive ? '花音正处于直播陪伴中，快点击右侧按钮进入直播间互动吧！' : '关注直播间，不错过下一次惊艳的 Live 陪伴~' }}
+            {{ liveInfo.isLive ? '花音正处于直播陪伴中，快点击右侧按钮进入直播间互动吧！' : '关注直播间，不错过下一次惊艳的 Live 陪伴~ (房间号: 21402309)' }}
           </p>
         </div>
 
