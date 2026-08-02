@@ -74,37 +74,47 @@ exports.handler = async function(event, context) {
     console.error('Fetch live room error:', e.message);
   }
 
-  // 2. 服务端尝试通过 B 站官方 Wbi 签名获取动态
   let dynamics = [];
   let debugInfo = null;
 
   try {
-    const fetchHeaders = {
+    const baseHeaders = {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Referer': `https://space.bilibili.com/${UID}`
     };
 
-    if (process.env.BILI_SESSDATA) {
-      fetchHeaders['Cookie'] = `SESSDATA=${process.env.BILI_SESSDATA}`;
-    }
-
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-    const navRes = await fetch('https://api.bilibili.com/x/web-interface/nav', { headers: fetchHeaders, signal: controller.signal });
-    const navJson = await navRes.json();
+    // 1. Fetch nav WITHOUT Cookie to avoid strict WAF on this public endpoint
+    const navRes = await fetch('https://api.bilibili.com/x/web-interface/nav', { headers: baseHeaders, signal: controller.signal });
+    const navText = await navRes.text();
+    if (navText.startsWith('<')) {
+      throw new Error(`Nav WAF Blocked: ${navText.slice(0, 100)}`);
+    }
+    const navJson = JSON.parse(navText);
     const imgUrl = navJson.data.wbi_img.img_url;
     const subUrl = navJson.data.wbi_img.sub_url;
     const imgKey = imgUrl.slice(imgUrl.lastIndexOf('/') + 1, imgUrl.lastIndexOf('.'));
     const subKey = subUrl.slice(subUrl.lastIndexOf('/') + 1, subUrl.lastIndexOf('.'));
 
+    // 2. Fetch dynamics WITH Cookie
+    const dynHeaders = { ...baseHeaders };
+    if (process.env.BILI_SESSDATA) {
+      dynHeaders['Cookie'] = `SESSDATA=${process.env.BILI_SESSDATA}`;
+    }
+
     const signedQuery = encWbi({ host_mid: UID }, imgKey, subKey);
     const dynUrl = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?${signedQuery}`;
 
-    const dynRes = await fetch(dynUrl, { headers: fetchHeaders, signal: controller.signal });
-    const dynData = await dynRes.json();
+    const dynRes = await fetch(dynUrl, { headers: dynHeaders, signal: controller.signal });
+    const dynText = await dynRes.text();
     clearTimeout(timeoutId);
     
+    if (dynText.startsWith('<')) {
+      throw new Error(`Dyn WAF Blocked: ${dynText.slice(0, 100)}`);
+    }
+    const dynData = JSON.parse(dynText);
     debugInfo = dynData;
 
     if (dynData.code === 0 && dynData.data && dynData.data.items) {
