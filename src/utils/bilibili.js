@@ -7,12 +7,20 @@
  */
 export async function fetchBilibiliData() {
   try {
-    const res = await fetch('/api/bilibili')
+    let res = await fetch('/api/bilibili')
+    if (res.ok) {
+      const contentType = res.headers.get('content-type') || ''
+      if (contentType.includes('application/json')) {
+        const data = await res.json()
+        if (data && data.success) return data
+      }
+    }
+
+    // Netlify Functions 直连兜底
+    res = await fetch('/.netlify/functions/bilibili')
     if (res.ok) {
       const data = await res.json()
-      if (data && data.success) {
-        return data
-      }
+      if (data && data.success) return data
     }
   } catch (e) {
     console.warn('[API Serverless Error]:', e.message)
