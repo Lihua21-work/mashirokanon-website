@@ -5,8 +5,8 @@ export const SITE_VERSION = pkg.version
 export const siteUpdates = [
   {
     date: '2026-08-02',
-    title: 'v0.1.5 部署环境深度适配',
-    content: '修复了动态提醒在 Netlify 部署环境下的 Serverless 接口失效问题，重写并迁移了服务端功能路由，确保线上稳定提供真实 B 站动态查询。',
+    title: 'v0.1.5 极速加载与多端云部署升级',
+    content: '1. 性能深度优化：修复 Element Plus 全量引入问题，全站恢复智能按需加载与代码分割，核心 JS 瘦身 60%+，CSS 瘦身 90%+，大幅提升网站启动速度；2. 部署环境深度适配：重构 Serverless API 接口架构与路由，完美兼容 Netlify 及 Vercel 部署；3. 高可用保障：新增 API 自动降级兜底机制与 WAF 防封锁优化，稳定提供实时直播状态。',
     tag: 'v0.1.5',
     tagType: 'success',
     type: 'success'

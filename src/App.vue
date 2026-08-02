@@ -18,7 +18,7 @@
         <div class="footer-content">
           <div class="footer-brand">
             <span class="footer-title">🥬 眞白花音粉丝站</span>
-            <p class="footer-desc">记录 Mashiro Kanon 的精彩瞬间，守护最可爱的白菜娘。</p>
+            <p class="footer-desc">记录 Mashiro Kanon 的精彩瞬间，守护最可爱的白菜。</p>
           </div>
           <div class="footer-links">
             <a href="https://space.bilibili.com/401480763" target="_blank">B站主页</a>

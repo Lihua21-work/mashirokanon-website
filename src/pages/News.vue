@@ -1,8 +1,38 @@
 <template>
   <div class="news-page">
     <div class="container">
-      <h1 class="page-title">动态提醒</h1>
-      <p class="subtitle">真白花音 B 站最新动态与实时直播状态 🔔</p>
+      <h1 class="page-title">直播状态</h1>
+      <p class="subtitle">真白花音 B 站官方直播间实时状态 🎥</p>
+
+      <!-- 控制与操作工具栏 -->
+      <div class="control-bar">
+        <div class="control-left">
+          <div class="section-badge">
+            <el-icon class="header-icon pink"><VideoCamera /></el-icon>
+            <span class="section-title">直播间看板</span>
+          </div>
+        </div>
+
+        <div class="control-right">
+          <span class="last-update-time" v-if="lastUpdated">
+            更新于 {{ lastUpdated }}
+          </span>
+          <el-button 
+            type="primary" 
+            size="small" 
+            round 
+            :loading="isLoading"
+            @click="loadData(true)"
+          >
+            <el-icon style="margin-right: 4px;"><Refresh /></el-icon>
+            刷新状态
+          </el-button>
+          <el-button type="info" size="small" round plain @click="openBiliSpace">
+            <el-icon style="margin-right: 4px;"><Link /></el-icon>
+            前往 B 站主页
+          </el-button>
+        </div>
+      </div>
 
       <!-- 直播开播状态高亮面板 -->
       <div class="live-banner-card" :class="{ 'is-live': liveInfo.isLive }">
@@ -41,96 +71,33 @@
         </div>
       </div>
 
-      <!-- 控制与操作工具栏 -->
-      <div class="control-bar">
-        <div class="control-left">
-          <div class="section-badge">
-            <el-icon class="header-icon pink"><ChatDotSquare /></el-icon>
-            <span class="section-title">最新 5 条动态提醒</span>
+      <!-- 直播间详细信息卡片 -->
+      <div class="info-card">
+        <h3 class="info-card-title">
+          <el-icon style="margin-right: 6px; color: var(--primary-color);"><InfoFilled /></el-icon>
+          直播间基本信息
+        </h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">主播名称</span>
+            <span class="info-value">眞白花音 (Mashiro Kanon)</span>
           </div>
-        </div>
-
-        <div class="control-right">
-          <span class="last-update-time" v-if="lastUpdated">
-            更新于 {{ lastUpdated }}
-          </span>
-          <el-button 
-            type="primary" 
-            size="small" 
-            round 
-            :loading="isLoading"
-            @click="loadData(true)"
-          >
-            <el-icon style="margin-right: 4px;"><Refresh /></el-icon>
-            刷新动态
-          </el-button>
-          <el-button type="info" size="small" round plain @click="openBiliSpace">
-            <el-icon style="margin-right: 4px;"><Link /></el-icon>
-            前往 B站 主页
-          </el-button>
-        </div>
-      </div>
-
-      <!-- 动态提醒列表卡片 -->
-      <div class="box-card">
-        <div class="timeline-container" v-loading="isLoading">
-          <el-timeline v-if="kanonNews.length > 0">
-            <el-timeline-item
-              v-for="(item, index) in displayNews"
-              :key="item.id || index"
-              :type="item.type || 'primary'"
-              :timestamp="item.date"
-              placement="top"
-            >
-              <div class="timeline-card">
-                <div class="card-top-bar">
-                  <div class="timeline-tag">
-                    <el-tag :type="item.tagType" size="small" round>{{ item.tag }}</el-tag>
-                    <el-tag v-if="item.isRealtime" type="info" size="small" effect="light" round class="realtime-badge">
-                      ⚡ 实时推送
-                    </el-tag>
-                  </div>
-                  <a 
-                    v-if="item.url" 
-                    :href="item.url" 
-                    target="_blank" 
-                    class="bili-link-btn"
-                  >
-                    查看 B 站原动态 <el-icon><TopRight /></el-icon>
-                  </a>
-                </div>
-
-                <h3 class="timeline-title" v-if="item.title && item.title !== item.content">
-                  {{ item.title }}
-                </h3>
-                <p class="timeline-content">{{ item.content }}</p>
-
-                <!-- 动态附带图片网络 -->
-                <div class="dynamic-image-grid" v-if="item.images && item.images.length > 0">
-                  <div 
-                    v-for="(img, imgIdx) in item.images" 
-                    :key="imgIdx" 
-                    class="img-item"
-                  >
-                    <el-image 
-                      :src="img" 
-                      :preview-src-list="item.images"
-                      :initial-index="imgIdx"
-                      fit="cover"
-                      loading="lazy"
-                      preview-teleported
-                    />
-                  </div>
-                </div>
-              </div>
-            </el-timeline-item>
-          </el-timeline>
-
-          <el-empty v-else description="由于 B 站接口限制，当前无法自动获取最新动态 ＞_＜" :image-size="80">
-            <el-button type="primary" round @click="openBiliSpace">
-              去 B 站个人主页查看最新动态
-            </el-button>
-          </el-empty>
+          <div class="info-item">
+            <span class="info-label">B站房间号</span>
+            <span class="info-value">21402309</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">直播间连接</span>
+            <a href="https://live.bilibili.com/21402309" target="_blank" class="info-link">
+              live.bilibili.com/21402309 <el-icon><TopRight /></el-icon>
+            </a>
+          </div>
+          <div class="info-item">
+            <span class="info-label">个人主页</span>
+            <a href="https://space.bilibili.com/401480763" target="_blank" class="info-link">
+              space.bilibili.com/401480763 <el-icon><TopRight /></el-icon>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -138,13 +105,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { VideoCamera, Refresh, Link, ChatDotSquare, TopRight } from '@element-plus/icons-vue'
-import { fetchLiveStatus, fetchUserDynamics } from '@/utils/bilibili'
+import { ref, onMounted } from 'vue'
+import { VideoCamera, Refresh, Link, TopRight, InfoFilled } from '@element-plus/icons-vue'
+import { fetchLiveStatus } from '@/utils/bilibili'
 
 const isLoading = ref(false)
 const lastUpdated = ref('')
-let timer = null
 
 // 直播状态数据
 const liveInfo = ref({
@@ -152,14 +118,6 @@ const liveInfo = ref({
   title: '',
   online: 0,
   roomUrl: 'https://live.bilibili.com/21402309'
-})
-
-// 动态数据列表
-const kanonNews = ref([])
-
-// 严格限定展示最新的 5 条动态
-const displayNews = computed(() => {
-  return kanonNews.value.slice(0, 5)
 })
 
 const formatOnline = (online) => {
@@ -174,23 +132,15 @@ const formatOnline = (online) => {
 const loadData = async (manual = false) => {
   isLoading.value = true
   try {
-    // 1. 获取直播开播状态
     const liveRes = await fetchLiveStatus()
     if (liveRes) {
       liveInfo.value = liveRes
     }
 
-    // 2. 获取用户最新 B 站动态 (自动限制最多 5 条)
-    const dynamicsRes = await fetchUserDynamics()
-    if (dynamicsRes && Array.isArray(dynamicsRes) && dynamicsRes.length > 0) {
-      kanonNews.value = dynamicsRes.slice(0, 5)
-    }
-
-    // 更新时间标记
     const now = new Date()
     lastUpdated.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
   } catch (err) {
-    console.error('加载数据失败:', err)
+    console.error('加载直播数据失败:', err)
   } finally {
     isLoading.value = false
   }
@@ -360,103 +310,64 @@ onMounted(() => {
   margin-right: 4px;
 }
 
-/* 动态列表卡片容器 */
-.box-card {
+/* 直播间信息卡片 */
+.info-card {
   background: var(--card-bg, #ffffff);
   border: 1px solid var(--card-border, rgba(0, 0, 0, 0.08));
   border-radius: var(--radius-lg, 16px);
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 24px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
-.timeline-container {
-  padding-top: 6px;
-}
-
-.timeline-card {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  border-radius: 12px;
-  padding: 18px 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.timeline-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-}
-
-.card-top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.timeline-tag {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.realtime-badge {
-  font-weight: 600;
-}
-
-.bili-link-btn {
-  font-size: 12px;
-  color: var(--primary-color, #ff7b9b);
-  text-decoration: none;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  transition: opacity 0.2s ease;
-}
-
-.bili-link-btn:hover {
-  opacity: 0.8;
-  text-decoration: underline;
-}
-
-.timeline-title {
-  margin: 0 0 8px 0;
-  color: var(--text-main);
-  font-size: 15px;
+.info-card-title {
+  font-size: 16px;
   font-weight: 700;
-  line-height: 1.4;
+  color: var(--text-main);
+  margin: 0 0 18px 0;
+  display: flex;
+  align-items: center;
 }
 
-.timeline-content {
-  margin: 0 0 12px 0;
-  color: var(--text-regular);
-  line-height: 1.6;
-  font-size: 14px;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* 动态图片预览网络 */
-.dynamic-image-grid {
+.info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 8px;
-  margin-top: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
 }
 
-.img-item {
-  width: 100%;
-  height: 110px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-.img-item .el-image {
-  width: 100%;
-  height: 100%;
+.info-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 14px;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.info-link {
+  font-size: 14px;
+  color: var(--primary-color, #ff7b9b);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-link:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 640px) {

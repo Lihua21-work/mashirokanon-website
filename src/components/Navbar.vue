@@ -38,7 +38,7 @@
         </el-menu-item>
         <el-menu-item index="/news">
           <el-icon><Bell /></el-icon>
-          <span>动态提醒</span>
+          <span>直播状态</span>
         </el-menu-item>
         <el-menu-item index="/about">
           <el-icon><InfoFilled /></el-icon>
@@ -87,7 +87,7 @@
             </el-menu-item>
             <el-menu-item index="/news">
               <el-icon><Bell /></el-icon>
-              <span>动态提醒</span>
+              <span>直播状态</span>
             </el-menu-item>
             <el-menu-item index="/about">
               <el-icon><InfoFilled /></el-icon>
