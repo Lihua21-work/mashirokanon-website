@@ -111,41 +111,77 @@ exports.handler = async function(event, context) {
     const dynText = await dynRes.text();
     clearTimeout(timeoutId);
     
+    let dynData = null;
     if (dynText.startsWith('<')) {
-      throw new Error(`Dyn WAF Blocked: ${dynText.slice(0, 100)}`);
+      // WAF blocked polymer API. Fallback to old dynamic API.
+      const fallbackUrl = `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${UID}`;
+      const fbRes = await fetch(fallbackUrl, { headers: dynHeaders, signal: controller.signal });
+      const fbText = await fbRes.text();
+      if (fbText.startsWith('<')) {
+        throw new Error(`Both APIs WAF Blocked. Fallback text: ${fbText.slice(0, 100)}`);
+      }
+      const fbData = JSON.parse(fbText);
+      // Map old API format to our standard array format
+      if (fbData.code === 0 && fbData.data && fbData.data.cards) {
+         dynamics = fbData.data.cards.slice(0, 5).map((card, idx) => {
+            const cardObj = JSON.parse(card.card);
+            let text = cardObj.item?.description || cardObj.item?.content || cardObj.title || cardObj.dynamic || '';
+            let date = '最新';
+            if (card.desc?.timestamp) {
+              const d = new Date(card.desc.timestamp * 1000);
+              date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            }
+            return {
+              id: `server-dyn-${idx}-${Date.now()}`,
+              title: text.includes('视频') ? '视频投稿' : 'B站动态',
+              content: text.trim() || '分享了内容',
+              date: date,
+              url: `https://space.bilibili.com/${UID}/dynamic`,
+              tag: text.includes('视频') ? '视频投稿' : 'B站动态',
+              tagType: text.includes('视频') ? 'success' : 'primary',
+              type: 'primary',
+              isRealtime: true
+            };
+         });
+         dynData = { _fallback: true, msg: 'Used vc API' };
+      } else {
+         dynData = fbData;
+      }
+    } else {
+      dynData = JSON.parse(dynText);
+      if (dynData.code === 0 && dynData.data && dynData.data.items) {
+        dynamics = dynData.data.items.slice(0, 5).map((item, idx) => {
+          const module_dynamic = item.modules?.module_dynamic;
+          const module_author = item.modules?.module_author;
+          
+          let text = module_dynamic?.desc?.text || module_dynamic?.major?.opus?.summary?.text || '';
+          if (!text && module_dynamic?.major?.archive) {
+              text = module_dynamic.major.archive.title;
+          }
+
+          let date = '最新';
+          if (module_author?.pub_ts) {
+            const d = new Date(module_author.pub_ts * 1000);
+            date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+          }
+
+          return {
+            id: `server-dyn-${idx}-${Date.now()}`,
+            title: text.includes('视频') ? '视频投稿' : 'B站动态',
+            content: text.trim() || '分享了内容',
+            date: date,
+            url: `https://space.bilibili.com/${UID}/dynamic`,
+            tag: text.includes('视频') ? '视频投稿' : 'B站动态',
+            tagType: text.includes('视频') ? 'success' : 'primary',
+            type: 'primary',
+            isRealtime: true
+          };
+        });
+      }
     }
-    const dynData = JSON.parse(dynText);
+    
     debugInfo = dynData;
 
-    if (dynData.code === 0 && dynData.data && dynData.data.items) {
-      dynamics = dynData.data.items.slice(0, 5).map((item, idx) => {
-        const module_dynamic = item.modules?.module_dynamic;
-        const module_author = item.modules?.module_author;
-        
-        let text = module_dynamic?.desc?.text || module_dynamic?.major?.opus?.summary?.text || '';
-        if (!text && module_dynamic?.major?.archive) {
-            text = module_dynamic.major.archive.title;
-        }
-
-        let date = '最新';
-        if (module_author?.pub_ts) {
-          const d = new Date(module_author.pub_ts * 1000);
-          date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-        }
-
-        return {
-          id: `server-dyn-${idx}-${Date.now()}`,
-          title: text.includes('视频') ? '视频投稿' : 'B站动态',
-          content: text.trim() || '分享了内容',
-          date: date,
-          url: `https://space.bilibili.com/${UID}/dynamic`,
-          tag: text.includes('视频') ? '视频投稿' : 'B站动态',
-          tagType: text.includes('视频') ? 'success' : 'primary',
-          type: 'primary',
-          isRealtime: true
-        };
-      });
-    }
   } catch (err) {
     console.error('Wbi API fetch error:', err.message);
     debugInfo = err.message;
