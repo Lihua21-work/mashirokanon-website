@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 const mixinKeyEncTab = [
   46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
@@ -33,7 +33,7 @@ function encWbi(params, imgKey, subKey) {
   return queryStr + '&w_rid=' + wbiSign;
 }
 
-exports.handler = async function(event, context) {
+export const handler = async function(event, context) {
   // CORS Headers
   const headers = {
     'Access-Control-Allow-Credentials': 'true',
