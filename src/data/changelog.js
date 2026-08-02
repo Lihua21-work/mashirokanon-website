@@ -5,8 +5,8 @@ export const SITE_VERSION = pkg.version
 export const siteUpdates = [
   {
     date: '2026-08-02',
-    title: 'v0.1.5 极速加载与多端云部署升级',
-    content: '1. 性能深度优化：修复 Element Plus 全量引入问题，全站恢复智能按需加载与代码分割，核心 JS 瘦身 60%+，CSS 瘦身 90%+，大幅提升网站启动速度；2. 部署环境深度适配：重构 Serverless API 接口架构与路由，完美兼容 Netlify 及 Vercel 部署；3. 高可用保障：新增 API 自动降级兜底机制与 WAF 防封锁优化，稳定提供实时直播状态。',
+    title: 'v0.1.5 极速加载与直播状态页重构',
+    content: '1. 页面重构与精简：将原「动态提醒」页面重构升级为纯粹的「直播状态」看板，移除复杂的 5 条 B 站动态抓取列表，聚焦呈现直播间实时开播状态、人气与基本信息；2. 性能深度优化：修复 Element Plus 全量引入问题，全站恢复智能按需加载与代码分割，核心 JS 瘦身 60%+，CSS 瘦身 90%+，大幅提升网站启动速度；3. 云端高可用：重构 Serverless 接口路由并适配 Netlify/Vercel 部署。',
     tag: 'v0.1.5',
     tagType: 'success',
     type: 'success'
